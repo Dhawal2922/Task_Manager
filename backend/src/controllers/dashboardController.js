@@ -15,9 +15,11 @@ const getDashboardStats = async (req, res, next) => {
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    const todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
 
     const sevenDaysLater = new Date(today);
     sevenDaysLater.setDate(today.getDate() + 7);
+    const sevenDaysLaterStr = sevenDaysLater.getFullYear() + '-' + String(sevenDaysLater.getMonth() + 1).padStart(2, '0') + '-' + String(sevenDaysLater.getDate()).padStart(2, '0');
 
     let taskWhere = {};
 
@@ -37,7 +39,7 @@ const getDashboardStats = async (req, res, next) => {
     const overdueTasks = await Task.findAll({
       where: {
         ...taskWhere,
-        due_date: { [Op.lt]: today.toISOString().split('T')[0] },
+        due_date: { [Op.lt]: todayStr },
         status: { [Op.ne]: 'Done' },
       },
       include: [
@@ -53,8 +55,8 @@ const getDashboardStats = async (req, res, next) => {
       where: {
         ...taskWhere,
         due_date: {
-          [Op.gte]: today.toISOString().split('T')[0],
-          [Op.lte]: sevenDaysLater.toISOString().split('T')[0],
+          [Op.gte]: todayStr,
+          [Op.lte]: sevenDaysLaterStr,
         },
         status: { [Op.ne]: 'Done' },
       },

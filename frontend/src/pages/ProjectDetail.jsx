@@ -191,8 +191,8 @@ export default function ProjectDetail() {
           <Link to="/projects" className="btn btn-ghost btn-sm mb-16" style={{ display: 'inline-flex', marginBottom: 12 }}>
             <ArrowLeft size={14} /> Back to Projects
           </Link>
-          <h1 className="page-title">{project.name}</h1>
-          {project.description && <p className="page-subtitle">{project.description}</p>}
+          <h1 className="page-title" style={{ fontSize: '2.25rem', fontWeight: 800, letterSpacing: '-0.03em' }}>{project.name}</h1>
+          {project.description && <p style={{ color: 'var(--clr-text-muted)', fontSize: '1rem', marginTop: 4, maxWidth: 600 }}>{project.description}</p>}
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
           {isAdmin && (
@@ -209,86 +209,109 @@ export default function ProjectDetail() {
       </div>
 
       {/* ─── Members ─────────────────────── */}
-      <div className="card mb-24">
-        <div className="card-header">
-          <h2 className="card-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}><Users size={16} /> Team Members</h2>
-          <span className="badge badge-member">{project.members?.length}</span>
+      <section className="project-section" style={{ marginBottom: 40 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          <h2 style={{ fontSize: '1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <Users size={18} color="var(--clr-primary)" /> Team Members
+          </h2>
+          <span className="kanban-column-count">{project.members?.length} Members</span>
         </div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+        <div className="members-grid">
           {project.members?.map((m) => (
-            <div key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--clr-surface-2)', border: '1px solid var(--clr-border)', borderRadius: 8, padding: '6px 12px' }}>
-              <div className="avatar" style={{ width: 28, height: 28, fontSize: '0.65rem' }}>
+            <div key={m.id} className="member-card">
+              <div className="avatar" style={{ width: 36, height: 36, fontSize: '0.8rem', borderRadius: 12 }}>
                 {m.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)}
               </div>
-              <div>
-                <div style={{ fontSize: '0.82rem', fontWeight: 600 }}>{m.name}</div>
-                <div className={`badge ${m.role === 'Admin' ? 'badge-admin' : 'badge-member'}`} style={{ marginTop: 2 }}>{m.role}</div>
+              <div className="member-card-info">
+                <div className="member-card-name">{m.name}</div>
+                <div className="member-card-role">{m.role}</div>
               </div>
             </div>
           ))}
         </div>
-      </div>
+      </section>
 
       {/* ─── Kanban Board ────────────────── */}
-      <h2 className="section-title">Tasks — Kanban View</h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
-        {Object.entries(tasksByStatus).map(([status, tasks]) => (
-          <div key={status} style={{ background: 'var(--clr-surface)', border: '1px solid var(--clr-border)', borderRadius: 12, padding: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-              <span className={`badge ${STATUS_BADGE[status]}`}>{status}</span>
-              <span style={{ marginLeft: 'auto', fontSize: '0.78rem', color: 'var(--clr-text-muted)', fontWeight: 600 }}>{tasks.length}</span>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {tasks.map((task) => {
-                const isMyTask = task.assigned_to_id === user?.id;
-                const canChangeStatus = isAdmin || isMyTask;
-                return (
-                  <div key={task.id} className="card" style={{ padding: 14, cursor: 'default' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 6 }}>
-                      <h4 style={{ fontSize: '0.85rem', fontWeight: 600, flex: 1 }}>{task.title}</h4>
-                      {isAdmin && (
-                        <button className="btn btn-danger btn-icon btn-sm" id={`btn-delete-task-${task.id}`} onClick={() => deleteTask(task.id, task.title)}>
-                          <Trash2 size={11} />
-                        </button>
+      <section className="project-section">
+        <h2 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
+          <Plus size={18} color="var(--clr-primary)" /> Project Board
+        </h2>
+        
+        <div className="kanban-board">
+          {Object.entries(tasksByStatus).map(([status, tasks]) => (
+            <div key={status} className="kanban-column">
+              <div className="kanban-column-header">
+                <h3 className="kanban-column-title">
+                  <div style={{ width: 8, height: 8, borderRadius: '50%', background: status === 'Todo' ? 'var(--clr-text-light)' : status === 'In-Progress' ? 'var(--clr-warning)' : 'var(--clr-success)' }} />
+                  {status}
+                </h3>
+                <span className="kanban-column-count">{tasks.length}</span>
+              </div>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {tasks.map((task) => {
+                  const isMyTask = task.assigned_to_id === user?.id;
+                  const canChangeStatus = isAdmin || isMyTask;
+                  return (
+                    <div key={task.id} className={`task-card priority-${task.priority.toLowerCase()}`}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, marginBottom: 8 }}>
+                        <h4 className="task-card-title">{task.title}</h4>
+                        {isAdmin && (
+                          <button className="btn btn-ghost btn-icon btn-sm" style={{ color: 'var(--clr-danger)', opacity: 0.5 }} id={`btn-delete-task-${task.id}`} onClick={() => deleteTask(task.id, task.title)}>
+                            <Trash2 size={14} />
+                          </button>
+                        )}
+                      </div>
+                      
+                      {task.description && <p className="task-card-desc">{task.description}</p>}
+                      
+                      <div className="task-card-meta">
+                        {task.due_date && (
+                          <div className="task-card-tag">
+                            <Plus size={12} style={{ transform: 'rotate(45deg)' }} />
+                            {new Date(task.due_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                          </div>
+                        )}
+                        
+                        {task.assignee && (
+                          <div className="task-card-assignee" style={{ marginLeft: 'auto' }}>
+                            <div className="avatar" style={{ width: 22, height: 22, fontSize: '0.6rem', borderRadius: 6 }}>
+                              {task.assignee.name.split(' ').map((n) => n[0]).join('').toUpperCase()}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {canChangeStatus && (
+                        <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px solid var(--clr-border)', display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--clr-text-light)', textTransform: 'uppercase' }}>Status</span>
+                          <select
+                            className="form-control"
+                            style={{ flex: 1, height: 32, fontSize: '0.75rem', padding: '0 8px', borderRadius: 8 }}
+                            value={task.status}
+                            onChange={(e) => updateTaskStatus(task.id, e.target.value)}
+                            id={`select-status-${task.id}`}
+                          >
+                            <option>Todo</option>
+                            <option>In-Progress</option>
+                            <option>Done</option>
+                          </select>
+                        </div>
                       )}
                     </div>
-                    {task.description && <p style={{ fontSize: '0.75rem', color: 'var(--clr-text-muted)', marginTop: 4, marginBottom: 8 }}>{task.description.slice(0, 80)}{task.description.length > 80 ? '…' : ''}</p>}
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 }}>
-                      <span className={`badge ${PRIORITY_BADGE[task.priority]}`}>{task.priority}</span>
-                      {task.due_date && <span className="tag">📅 {task.due_date}</span>}
-                    </div>
-                    {task.assignee && (
-                      <div style={{ fontSize: '0.72rem', color: 'var(--clr-text-muted)', marginTop: 8, display: 'flex', alignItems: 'center', gap: 4 }}>
-                        <div className="avatar" style={{ width: 18, height: 18, fontSize: '0.55rem' }}>
-                          {task.assignee.name.split(' ').map((n) => n[0]).join('')}
-                        </div>
-                        {task.assignee.name}
-                      </div>
-                    )}
-                    {canChangeStatus && (
-                      <select
-                        className="form-control"
-                        style={{ marginTop: 10, fontSize: '0.75rem', padding: '4px 8px' }}
-                        value={task.status}
-                        onChange={(e) => updateTaskStatus(task.id, e.target.value)}
-                        id={`select-status-${task.id}`}
-                        title={isAdmin ? 'Admin: change any status' : 'Member: update your task status'}
-                      >
-                        <option>Todo</option><option>In-Progress</option><option>Done</option>
-                      </select>
-                    )}
+                  );
+                })}
+                
+                {tasks.length === 0 && (
+                  <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--clr-text-light)', fontSize: '0.8rem', border: '2px dashed var(--clr-border)', borderRadius: 14 }}>
+                    No tasks in {status}
                   </div>
-                );
-              })}
-              {tasks.length === 0 && (
-                <div style={{ textAlign: 'center', padding: '20px 0', color: 'var(--clr-text-faint)', fontSize: '0.8rem' }}>
-                  No tasks here
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </section>
 
       {showTaskModal && (
         <TaskModal projectId={id} members={project.members} onClose={() => setShowTaskModal(false)} onCreated={fetchProject} />
