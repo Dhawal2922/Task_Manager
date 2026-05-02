@@ -21,12 +21,8 @@ const getDashboardStats = async (req, res, next) => {
 
     let taskWhere = {};
 
-    // Members only see stats for their own assigned tasks & their projects
+    // Members only see stats for their own assigned tasks
     if (req.user.role === 'Member') {
-      // Get IDs of projects the user is a member of
-      const memberships = await ProjectMember.findAll({ where: { user_id: req.user.id } });
-      const projectIds = memberships.map((m) => m.project_id);
-      taskWhere.project_id = { [Op.in]: projectIds };
       taskWhere.assigned_to_id = req.user.id;
     }
 

@@ -10,6 +10,8 @@ import Projects from './pages/Projects';
 import ProjectDetail from './pages/ProjectDetail';
 import TaskDetail from './pages/TaskDetail';
 import Users from './pages/Users';
+import Settings from './pages/Settings';
+import { useEffect } from 'react';
 
 function ProtectedRoute({ children }) {
   const token = useAuthStore((s) => s.token);
@@ -22,20 +24,24 @@ function GuestRoute({ children }) {
 }
 
 export default function App() {
+  useEffect(() => {
+    const theme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+  }, []);
+
   return (
     <BrowserRouter>
       <Toaster
         position="top-right"
         toastOptions={{
           style: {
-            background: '#1c2133',
-            color: '#e2e8f0',
-            border: '1px solid #252d42',
-            borderRadius: '10px',
-            fontSize: '0.85rem',
+            background: 'var(--clr-surface)',
+            color: 'var(--clr-text)',
+            border: '1px solid var(--clr-border)',
+            borderRadius: '12px',
+            fontSize: '0.875rem',
+            boxShadow: 'var(--shadow-lg)',
           },
-          success: { iconTheme: { primary: '#10b981', secondary: '#1c2133' } },
-          error: { iconTheme: { primary: '#ef4444', secondary: '#1c2133' } },
         }}
       />
       <Routes>
@@ -49,6 +55,7 @@ export default function App() {
           <Route path="projects/:id" element={<ProjectDetail />} />
           <Route path="projects/:projectId/tasks/:taskId" element={<TaskDetail />} />
           <Route path="users" element={<Users />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
     </BrowserRouter>

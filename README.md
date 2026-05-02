@@ -1,4 +1,4 @@
-# ProjectFlow — Production-Ready Project Management App
+# Team Task Manager — Production-Ready Project Management App
 
 > A full-stack, role-based project management platform built with **Node.js/Express**, **PostgreSQL/Sequelize**, and **React/Vite**. Deployable to Railway in minutes.
 
@@ -9,17 +9,17 @@
 
 ## 📋 Project Overview
 
-ProjectFlow enforces strict **Role-Based Access Control (RBAC)**:
+Team Task Manager enforces strict **Role-Based Access Control (RBAC)**:
 
-| Feature | Admin | Member |
-|---|---|---|
-| Create/Delete Projects | ✅ | ❌ |
-| View assigned projects | ✅ | ✅ |
-| Create/Delete Tasks | ✅ | ❌ |
-| Update own task status | ✅ | ✅ (own tasks only) |
-| Add/Remove project members | ✅ | ❌ |
-| View all team members | ✅ | ❌ |
-| Dashboard (global stats) | ✅ (all data) | ✅ (own data) |
+| Feature                    | Admin         | Member              |
+| -------------------------- | ------------- | ------------------- |
+| Create/Delete Projects     | ✅            | ❌                  |
+| View assigned projects     | ✅            | ✅                  |
+| Create/Delete Tasks        | ✅            | ❌                  |
+| Update own task status     | ✅            | ✅ (own tasks only) |
+| Add/Remove project members | ✅            | ❌                  |
+| View all team members      | ✅            | ❌                  |
+| Dashboard (global stats)   | ✅ (all data) | ✅ (own data)       |
 
 ---
 
@@ -66,6 +66,7 @@ role (enum)     timestamps        priority (enum)
 ## 🚀 Local Setup
 
 ### Prerequisites
+
 - Node.js 18+
 - PostgreSQL 14+ (running locally or via Docker)
 
@@ -113,11 +114,13 @@ cd backend && npm run db:migrate
 ### 4. Run Development Servers
 
 **Backend** (port 5000):
+
 ```bash
 cd backend && npm run dev
 ```
 
 **Frontend** (port 3000):
+
 ```bash
 cd frontend && npm run dev
 ```
@@ -131,6 +134,7 @@ Visit `http://localhost:3000`
 ### Authentication
 
 #### POST `/api/auth/signup`
+
 ```json
 // Request
 {
@@ -148,6 +152,7 @@ Visit `http://localhost:3000`
 ```
 
 #### POST `/api/auth/login`
+
 ```json
 // Request
 { "email": "jane@company.com", "password": "securePass123" }
@@ -157,37 +162,39 @@ Visit `http://localhost:3000`
 ```
 
 #### GET `/api/auth/me` 🔒
+
 Returns the current authenticated user.
 
 ---
 
 ### Projects 🔒 (All require Bearer token)
 
-| Method | Endpoint | Role | Description |
-|---|---|---|---|
-| GET | `/api/projects` | All | List accessible projects |
-| POST | `/api/projects` | Admin | Create project |
-| GET | `/api/projects/:id` | All (members only) | Project details + tasks |
-| PUT | `/api/projects/:id` | Admin | Update project |
-| DELETE | `/api/projects/:id` | Admin | Delete project (cascades tasks) |
-| POST | `/api/projects/:id/members` | Admin | Add member `{ user_id }` |
-| DELETE | `/api/projects/:id/members/:userId` | Admin | Remove member |
+| Method | Endpoint                            | Role               | Description                     |
+| ------ | ----------------------------------- | ------------------ | ------------------------------- |
+| GET    | `/api/projects`                     | All                | List accessible projects        |
+| POST   | `/api/projects`                     | Admin              | Create project                  |
+| GET    | `/api/projects/:id`                 | All (members only) | Project details + tasks         |
+| PUT    | `/api/projects/:id`                 | Admin              | Update project                  |
+| DELETE | `/api/projects/:id`                 | Admin              | Delete project (cascades tasks) |
+| POST   | `/api/projects/:id/members`         | Admin              | Add member `{ user_id }`        |
+| DELETE | `/api/projects/:id/members/:userId` | Admin              | Remove member                   |
 
 ---
 
 ### Tasks 🔒 (Nested under projects)
 
-| Method | Endpoint | Role | Description |
-|---|---|---|---|
-| GET | `/api/projects/:pid/tasks` | Members | List tasks (filterable: `?status=Todo&priority=High`) |
-| POST | `/api/projects/:pid/tasks` | Admin | Create task |
-| GET | `/api/projects/:pid/tasks/:id` | Members | Get single task |
-| PUT | `/api/projects/:pid/tasks/:id` | Admin / Member* | Update task |
-| DELETE | `/api/projects/:pid/tasks/:id` | Admin | Delete task |
+| Method | Endpoint                       | Role             | Description                                           |
+| ------ | ------------------------------ | ---------------- | ----------------------------------------------------- |
+| GET    | `/api/projects/:pid/tasks`     | Members          | List tasks (filterable: `?status=Todo&priority=High`) |
+| POST   | `/api/projects/:pid/tasks`     | Admin            | Create task                                           |
+| GET    | `/api/projects/:pid/tasks/:id` | Members          | Get single task                                       |
+| PUT    | `/api/projects/:pid/tasks/:id` | Admin / Member\* | Update task                                           |
+| DELETE | `/api/projects/:pid/tasks/:id` | Admin            | Delete task                                           |
 
-> *Members can only update `status` on tasks assigned to them.
+> \*Members can only update `status` on tasks assigned to them.
 
 **Create Task Payload:**
+
 ```json
 {
   "title": "Implement login page",
@@ -204,6 +211,7 @@ Returns the current authenticated user.
 ### Dashboard 🔒
 
 #### GET `/api/dashboard/stats`
+
 ```json
 // Response 200
 {
@@ -222,6 +230,7 @@ Returns the current authenticated user.
 ### Users 🔒 (Admin only)
 
 #### GET `/api/users`
+
 Returns all registered users with IDs (useful for assigning project members).
 
 ---
@@ -229,6 +238,7 @@ Returns all registered users with IDs (useful for assigning project members).
 ## 🚂 Deployment to Railway
 
 ### Step 1: Push to GitHub
+
 ```bash
 git init && git add . && git commit -m "Initial commit"
 git remote add origin https://github.com/your/repo.git
@@ -236,21 +246,24 @@ git push -u origin main
 ```
 
 ### Step 2: Create Railway Project
+
 1. Go to [railway.app](https://railway.app) → New Project → Deploy from GitHub repo
 2. Add a **PostgreSQL** service (Railway auto-provisions it)
 
 ### Step 3: Set Environment Variables
+
 In Railway's dashboard → Variables, add:
 
-| Variable | Value |
-|---|---|
-| `DATABASE_URL` | Auto-filled by Railway PostgreSQL plugin |
-| `JWT_SECRET` | Strong random string (min 32 chars) |
-| `JWT_EXPIRES_IN` | `7d` |
-| `NODE_ENV` | `production` |
-| `CLIENT_ORIGIN` | Your frontend URL |
+| Variable         | Value                                    |
+| ---------------- | ---------------------------------------- |
+| `DATABASE_URL`   | Auto-filled by Railway PostgreSQL plugin |
+| `JWT_SECRET`     | Strong random string (min 32 chars)      |
+| `JWT_EXPIRES_IN` | `7d`                                     |
+| `NODE_ENV`       | `production`                             |
+| `CLIENT_ORIGIN`  | Your frontend URL                        |
 
 ### Step 4: Deploy
+
 Railway auto-detects the `Procfile` and deploys. The health check at `/health` confirms the service is live.
 
 ---
@@ -273,7 +286,7 @@ Railway auto-detects the `Procfile` and deploys. The health check at `/health` c
 - **[1:30]** Open the project → No **Add Task** or **Add Member** buttons visible. No delete buttons on tasks.
 - **[1:40]** On the task assigned to this Member — change the status dropdown from `Todo` → `In-Progress` → Status updated successfully.
 - **[1:50]** Try to access another project's task directly via URL — API returns **403 Forbidden**.
-- **[2:00]** "That's ProjectFlow — clean RBAC, real-time Kanban, and production-ready APIs."
+- **[2:00]** "That's Team Task Manager — clean RBAC, real-time Kanban, and production-ready APIs."
 
 ---
 

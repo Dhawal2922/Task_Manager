@@ -35,46 +35,48 @@ function TaskModal({ projectId, members, onClose, onCreated }) {
           <button className="btn btn-ghost btn-icon btn-sm" onClick={onClose}>✕</button>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} id="form-create-task">
-          <div className="form-group">
-            <label className="form-label">Title *</label>
-            <input className="form-control" placeholder="Task title…" {...register('title', { required: 'Title required' })} />
-            {errors.title && <p className="form-error">{errors.title.message}</p>}
-          </div>
-          <div className="form-group">
-            <label className="form-label">Description</label>
-            <textarea className="form-control" rows={2} placeholder="Details…" {...register('description')} />
-          </div>
-          <div className="grid-2">
+          <div className="modal-body">
             <div className="form-group">
-              <label className="form-label">Status</label>
-              <select className="form-control" {...register('status')}>
-                <option>Todo</option><option>In-Progress</option><option>Done</option>
-              </select>
+              <label className="form-label">Title *</label>
+              <input className="form-control" placeholder="Task title…" {...register('title', { required: 'Title required' })} />
+              {errors.title && <p className="form-error">{errors.title.message}</p>}
             </div>
             <div className="form-group">
-              <label className="form-label">Priority</label>
-              <select className="form-control" {...register('priority')}>
-                <option>Low</option><option>Medium</option><option>High</option>
-              </select>
+              <label className="form-label">Description</label>
+              <textarea className="form-control" rows={2} placeholder="Details…" {...register('description')} />
+            </div>
+            <div className="grid-2">
+              <div className="form-group">
+                <label className="form-label">Status</label>
+                <select className="form-control" {...register('status')}>
+                  <option>Todo</option><option>In-Progress</option><option>Done</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Priority</label>
+                <select className="form-control" {...register('priority')}>
+                  <option>Low</option><option>Medium</option><option>High</option>
+                </select>
+              </div>
+            </div>
+            <div className="grid-2">
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label className="form-label">Due Date</label>
+                <input type="date" className="form-control" {...register('due_date')} />
+              </div>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label className="form-label">Assign To</label>
+                <select className="form-control" {...register('assigned_to_id')}>
+                  <option value="">Unassigned</option>
+                  {members?.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
+                </select>
+              </div>
             </div>
           </div>
-          <div className="grid-2">
-            <div className="form-group">
-              <label className="form-label">Due Date</label>
-              <input type="date" className="form-control" {...register('due_date')} />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Assign To</label>
-              <select className="form-control" {...register('assigned_to_id')}>
-                <option value="">Unassigned</option>
-                {members?.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
-              </select>
-            </div>
-          </div>
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
+          <div className="modal-footer">
             <button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button>
             <button type="submit" id="btn-submit-task" className="btn btn-primary" disabled={loading}>
-              {loading ? <span className="spinner" /> : <><Plus size={15} /> Create Task</>}
+              {loading ? <span className="spinner" /> : <><Plus size={18} /> Create Task</>}
             </button>
           </div>
         </form>
@@ -114,20 +116,22 @@ function AddMemberModal({ projectId, onClose, onAdded }) {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal animate-slide" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 420 }}>
+      <div className="modal animate-slide" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 460 }}>
         <div className="modal-header">
           <h2 className="modal-title">Add Member</h2>
           <button className="btn btn-ghost btn-icon btn-sm" onClick={onClose}>✕</button>
         </div>
-        <div className="form-group">
-          <label className="form-label">User ID</label>
-          <input className="form-control" placeholder="Paste the User UUID…" value={userId} onChange={(e) => setUserId(e.target.value)} />
-          <p className="text-xs text-muted mt-4">You can find user IDs in the Team Members page.</p>
+        <div className="modal-body">
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label className="form-label">User ID</label>
+            <input className="form-control" placeholder="Paste the User UUID…" value={userId} onChange={(e) => setUserId(e.target.value)} />
+            <p className="text-xs text-muted" style={{ marginTop: 12 }}>You can find user IDs in the Team Members page.</p>
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
+        <div className="modal-footer">
           <button className="btn btn-secondary" onClick={onClose}>Cancel</button>
           <button id="btn-add-member" className="btn btn-primary" onClick={handleAdd} disabled={loading}>
-            {loading ? <span className="spinner" /> : <><UserPlus size={14} /> Add</>}
+            {loading ? <span className="spinner" /> : <><UserPlus size={16} /> Add Member</>}
           </button>
         </div>
       </div>

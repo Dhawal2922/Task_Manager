@@ -7,6 +7,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 
 const { sequelize } = require('./models');
 const errorHandler = require('./middleware/errorHandler');
@@ -68,7 +69,19 @@ app.get('/health', (req, res) =>
   res.status(200).json({ success: true, status: 'OK', timestamp: new Date().toISOString() })
 );
 
-// 404 handler
+// Serve static assets in production
+if (process.env.NODE_ENV === 'production') {
+  const publicPath = path.join(__dirname, '../../frontend/dist');
+  app.use(express.static(publicPath));
+  
+  // SPA fallback
+  app.get('*', (req, res, next) => {
+    if (req.url.startsWith('/api')) return next();
+    res.sendFile(path.join(publicPath, 'index.html'));
+  });
+}
+
+// 404 handler for API
 app.use((req, res) =>
   res.status(404).json({ success: false, message: `Route ${req.method} ${req.originalUrl} not found.` })
 );

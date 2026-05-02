@@ -10,10 +10,7 @@ export default function UsersPage() {
   const user = useAuthStore((s) => s.user);
 
   useEffect(() => {
-    // Fetch all users via the dashboard stats (admin only page)
-    // We'll implement a /api/users endpoint in the backend for this
     api.get('/users').then((r) => setUsers(r.data.data.users)).catch(() => {
-      // Fallback: show current user info
       setUsers([user].filter(Boolean));
     }).finally(() => setLoading(false));
   }, []);
@@ -25,13 +22,13 @@ export default function UsersPage() {
 
   return (
     <div className="animate-fade">
-      <div className="page-header">
+      <div className="page-header" style={{ alignItems: 'center' }}>
         <div>
           <h1 className="page-title">Team Members</h1>
-          <p className="page-subtitle">All registered users in your workspace</p>
+          <p className="page-subtitle">Manage system users and their workspace permissions.</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 8, padding: '8px 14px', fontSize: '0.82rem', color: 'var(--clr-primary-glow)' }}>
-          <Shield size={14} /> Admin Only View
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--clr-primary-subtle)', color: 'var(--clr-primary)', padding: '10px 20px', borderRadius: '12px', fontSize: '0.875rem', fontWeight: 600, border: '1px solid rgba(0,103,255,0.1)' }}>
+          <Shield size={16} /> Admin Managed View
         </div>
       </div>
 
@@ -43,37 +40,61 @@ export default function UsersPage() {
             <table>
               <thead>
                 <tr>
-                  <th>User</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>User ID</th>
-                  <th>Joined</th>
+                  <th>User Information</th>
+                  <th>Workspace Role</th>
+                  <th>System Identity</th>
+                  <th>Joined Date</th>
                 </tr>
               </thead>
               <tbody>
                 {users.map((u) => (
                   <tr key={u.id}>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <div className="avatar" style={{ width: 32, height: 32, fontSize: '0.7rem' }}>
+                    <td style={{ padding: '20px 16px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                        <div className="avatar" style={{ width: 42, height: 42, borderRadius: 10, background: u.role === 'Admin' ? 'var(--clr-primary)' : 'var(--clr-text-light)', fontSize: '0.9rem' }}>
                           {u.name?.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)}
                         </div>
-                        <span className="font-semibold">{u.name}</span>
+                        <div>
+                          <div style={{ fontWeight: 700, color: 'var(--clr-text)', fontSize: '0.95rem' }}>{u.name}</div>
+                          <div style={{ color: 'var(--clr-text-muted)', fontSize: '0.8rem' }}>{u.email}</div>
+                        </div>
                       </div>
                     </td>
-                    <td className="text-muted">{u.email}</td>
-                    <td><span className={`badge ${u.role === 'Admin' ? 'badge-admin' : 'badge-member'}`}>{u.role}</span></td>
                     <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <code style={{ fontSize: '0.72rem', color: 'var(--clr-text-muted)', background: 'var(--clr-surface-2)', padding: '2px 8px', borderRadius: 4 }}>
-                          {u.id?.slice(0, 8)}…
+                      <span className={`badge ${u.role === 'Admin' ? 'badge-admin' : 'badge-member'}`} style={{ 
+                        padding: '4px 14px', 
+                        fontSize: '0.75rem', 
+                        background: u.role === 'Admin' ? 'rgba(0,103,255,0.1)' : 'var(--clr-bg)',
+                        color: u.role === 'Admin' ? 'var(--clr-primary)' : 'var(--clr-text-muted)',
+                        border: '1px solid ' + (u.role === 'Admin' ? 'rgba(0,103,255,0.2)' : 'var(--clr-border)')
+                      }}>
+                        {u.role}
+                      </span>
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <code style={{ 
+                          fontFamily: 'monospace', 
+                          fontSize: '0.75rem', 
+                          color: 'var(--clr-text-muted)', 
+                          background: 'var(--clr-surface-2)', 
+                          padding: '6px 12px', 
+                          borderRadius: 6,
+                          border: '1px solid var(--clr-border)'
+                        }}>
+                          {u.id?.slice(0, 12)}...
                         </code>
-                        <button className="btn btn-ghost btn-icon btn-sm" onClick={() => copyId(u.id)} title="Copy full ID" id={`btn-copy-${u.id}`}>
-                          <Copy size={12} />
+                        <button className="btn btn-ghost btn-sm" onClick={() => copyId(u.id)} style={{ padding: 6, opacity: 0.6 }}>
+                          <Copy size={14} />
                         </button>
                       </div>
                     </td>
-                    <td className="text-muted text-sm">{u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '—'}</td>
+                    <td>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--clr-text)' }}>{u.createdAt ? new Date(u.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}</span>
+                        <span style={{ fontSize: '0.725rem', color: 'var(--clr-text-light)' }}>Registration Date</span>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>

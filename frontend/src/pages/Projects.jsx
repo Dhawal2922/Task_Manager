@@ -33,19 +33,21 @@ function ProjectModal({ onClose, onCreated }) {
           <button className="btn btn-ghost btn-icon btn-sm" onClick={onClose}>✕</button>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} id="form-create-project">
-          <div className="form-group">
-            <label className="form-label" htmlFor="proj-name">Project Name *</label>
-            <input id="proj-name" className="form-control" placeholder="e.g. Website Redesign" {...register('name', { required: 'Name is required', minLength: { value: 2, message: 'Min 2 characters' } })} />
-            {errors.name && <p className="form-error">{errors.name.message}</p>}
+          <div className="modal-body">
+            <div className="form-group">
+              <label className="form-label" htmlFor="proj-name">Project Name *</label>
+              <input id="proj-name" className="form-control" placeholder="e.g. Website Redesign" {...register('name', { required: 'Name is required', minLength: { value: 2, message: 'Min 2 characters' } })} />
+              {errors.name && <p className="form-error">{errors.name.message}</p>}
+            </div>
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label className="form-label" htmlFor="proj-desc">Description</label>
+              <textarea id="proj-desc" className="form-control" rows={3} placeholder="What is this project about?" {...register('description')} />
+            </div>
           </div>
-          <div className="form-group">
-            <label className="form-label" htmlFor="proj-desc">Description</label>
-            <textarea id="proj-desc" className="form-control" rows={3} placeholder="What is this project about?" {...register('description')} />
-          </div>
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
+          <div className="modal-footer">
             <button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button>
             <button type="submit" id="btn-create-project" className="btn btn-primary" disabled={loading}>
-              {loading ? <span className="spinner" /> : <><Plus size={15} /> Create Project</>}
+              {loading ? <span className="spinner" /> : <><Plus size={18} /> Create Project</>}
             </button>
           </div>
         </form>
@@ -95,47 +97,44 @@ export default function Projects() {
       {loading ? (
         <div className="page-loader"><div className="spinner" style={{ width: 32, height: 32, borderTopColor: 'var(--clr-primary)' }} /></div>
       ) : projects.length === 0 ? (
-        <div className="card">
+        <div className="card" style={{ padding: '80px 0' }}>
           <div className="empty-state">
-            <div className="empty-state-icon"><FolderKanban size={40} /></div>
-            <div className="empty-state-title">No projects yet</div>
-            <p className="empty-state-text">{isAdmin ? 'Create your first project to get started.' : 'You haven\'t been assigned to any projects yet.'}</p>
-            {isAdmin && <button className="btn btn-primary mt-16" onClick={() => setShowModal(true)}><Plus size={16} /> Create Project</button>}
+            <div className="empty-state-icon"><FolderKanban size={32} /></div>
+            <h2 className="empty-state-title">No projects yet</h2>
+            <p className="empty-state-text">{isAdmin ? 'Create your first project to get started and assign your team.' : 'You haven\'t been assigned to any projects yet.'}</p>
+            {isAdmin && <button className="btn btn-primary" onClick={() => setShowModal(true)}><Plus size={18} /> Create Project</button>}
           </div>
         </div>
       ) : (
         <div className="grid-3">
           {projects.map((p) => (
-            <div key={p.id} className="card card-hover" style={{ cursor: 'default' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
-                <div style={{ width: 42, height: 42, borderRadius: 10, background: 'var(--clr-primary-subtle)', display: 'grid', placeItems: 'center' }}>
-                  <FolderKanban size={20} color="var(--clr-primary-glow)" />
+            <div key={p.id} className="card" style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
+                <div style={{ width: 48, height: 48, borderRadius: 12, background: 'var(--clr-primary-subtle)', display: 'grid', placeItems: 'center' }}>
+                  <FolderKanban size={24} color="var(--clr-primary)" />
                 </div>
                 {isAdmin && (
                   <button
-                    className="btn btn-danger btn-icon btn-sm"
-                    id={`btn-delete-project-${p.id}`}
+                    className="btn btn-secondary btn-icon btn-sm"
                     onClick={() => deleteProject(p.id, p.name)}
-                    title="Delete project"
+                    style={{ color: 'var(--clr-danger)', borderColor: 'transparent' }}
                   >
-                    <Trash2 size={13} />
+                    <Trash2 size={14} />
                   </button>
                 )}
               </div>
 
-              <h3 style={{ fontWeight: 700, fontSize: '1rem', marginBottom: 6, color: 'var(--clr-text)' }}>{p.name}</h3>
-              <p style={{ fontSize: '0.82rem', color: 'var(--clr-text-muted)', marginBottom: 16, lineHeight: 1.5 }}>
-                {p.description || 'No description provided.'}
+              <h3 style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: 8 }}>{p.name}</h3>
+              <p style={{ fontSize: '0.9rem', color: 'var(--clr-text-muted)', flex: 1, marginBottom: 24 }}>
+                {p.description || 'No description provided for this project.'}
               </p>
 
-              <div className="divider" style={{ margin: '12px 0' }} />
-
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', color: 'var(--clr-text-muted)' }}>
-                  <Users size={13} />
-                  <span>{p.members?.length ?? 0} member{p.members?.length !== 1 ? 's' : ''}</span>
+              <div style={{ paddingTop: 20, borderTop: '1px solid var(--clr-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.8rem', color: 'var(--clr-text-muted)', fontWeight: 500 }}>
+                  <Users size={14} />
+                  <span>{p.members?.length ?? 0} Team Member{p.members?.length !== 1 ? 's' : ''}</span>
                 </div>
-                <Link to={`/projects/${p.id}`} className="btn btn-ghost btn-sm" id={`btn-view-project-${p.id}`}>
+                <Link to={`/projects/${p.id}`} className="btn btn-secondary btn-sm" style={{ fontWeight: 700 }}>
                   View <ChevronRight size={14} />
                 </Link>
               </div>
