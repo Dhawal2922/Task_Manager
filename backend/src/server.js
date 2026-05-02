@@ -97,8 +97,8 @@ app.use(errorHandler);
     await sequelize.sync({ alter: process.env.NODE_ENV !== 'production' });
     console.log('✅ Schema synced.');
 
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT} [${process.env.NODE_ENV || 'development'}]`);
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`🚀 Server running on 0.0.0.0:${PORT} [${process.env.NODE_ENV || 'development'}]`);
     });
   } catch (err) {
     console.error('❌ Failed to start server:', err);
